@@ -784,13 +784,15 @@ export default {
         this.$store.dispatch('loadVehiculos');
         this.getOperadoresOt();
         this.getCms();
-        this.CargaDeDatos();
         this.$store.dispatch('loadServiciosOt',this.otdata.id);
         this.$store.dispatch('loadDiametros');
         this.$store.dispatch('loadMedidasPlaca');
 
     },
 
+    mounted : function() {
+        this.CargaDeDatos();
+    },
     watch :{
 
         fecha : function(){
@@ -823,24 +825,16 @@ export default {
         deshabilitarInformes : function(fecha_informe,obra_informe,informe_sel){
 
             if(informe_sel){
-
                 return false;
-
-            }
-            else if(!this.fecha_mysql){
-
+            }else if(!this.fecha_mysql){
                 return true ;
-
             }else if(this.permitir_anteriores_sn && this.obra == obra_informe){
-
                 return false;
-
+            }else if(this.fecha_mysql == fecha_informe && !this.obra){
+                return false;
             }else if(this.fecha_mysql != fecha_informe || this.obra != obra_informe){
-
                 return true;
-
             }else{
-
                 return false;
             }
 
@@ -849,9 +843,9 @@ export default {
         CargaDeDatos : function(){
 
             if(this.editmode) {
-
                this.TablaVehiculos =  JSON.parse(JSON.stringify(this.vehiculos_data));
                this.TablaResponsables =  JSON.parse(JSON.stringify(this.responsables_data));
+               eventHeaderParte.$emit('set-obra-header',this.parte_data.obra);
                this.fecha  = this.parte_data.fecha;
                this.tipo_servicio = this.parte_data.tipo_servicio;
                this.horario = this.parte_data.horario;
@@ -876,6 +870,7 @@ export default {
         setObra : function(value){
 
             this.obra = value;
+            this.resetInformesSelect();
         },
 
         resetInformesSelect : function(){
@@ -1026,7 +1021,7 @@ export default {
                         if((item_data.informe_importado_id == item_informe.id) && (item_informe.importable_sn)){
 
                                 item_informe.informe_sel = true;
-                                eventHeaderParte.$emit('set-obra-header',item_informe.obra);
+                                // eventHeaderParte.$emit('set-obra-header',item_informe.obra);
                             }
                         });
 
@@ -1063,7 +1058,7 @@ export default {
                             if((item_data.informe_id == item_informe.id) && (!item_informe.importable_sn)){
 
                                   item_informe.informe_sel = true;
-                                  eventHeaderParte.$emit('set-obra-header',item_informe.obra);
+                                  // eventHeaderParte.$emit('set-obra-header',item_informe.obra);
 
                                 }
 
@@ -1137,7 +1132,7 @@ export default {
                                 if((item_data.informe_id == item_informe.id) && (!item_informe.importable_sn)){
 
                                     item_informe.informe_sel = true;
-                                    eventHeaderParte.$emit('set-obra-header',item_informe.obra);
+                                    // eventHeaderParte.$emit('set-obra-header',item_informe.obra);
 
                                     }
                                 });
@@ -1178,7 +1173,7 @@ export default {
                                 if((item_data.informe_id == item_informe.id) && (!item_informe.importable_sn)){
 
                                     item_informe.informe_sel = true;
-                                    eventHeaderParte.$emit('set-obra-header',item_informe.obra);
+                                    // eventHeaderParte.$emit('set-obra-header',item_informe.obra);
 
                                     }
                                 });
@@ -1220,7 +1215,7 @@ export default {
                                 if((item_data.informe_id == item_informe.id) && (!item_informe.importable_sn)){
 
                                     item_informe.informe_sel = true;
-                                    eventHeaderParte.$emit('set-obra-header',item_informe.obra);
+                                    // eventHeaderParte.$emit('set-obra-header',item_informe.obra);
                                  }
                                 });
 
@@ -1731,7 +1726,6 @@ export default {
 
                 }.bind(this));
 
-
         },
 
         RecalcularMetros(metodo){
@@ -2134,6 +2128,7 @@ export default {
               url : urlRegistros,
               data : {
                 'ot'                   : this.otdata,
+                'obra'                 : this.obra,
                 'fecha'                : this.fecha,
                 'tipo_servicio'        : this.tipo_servicio,
                 'horario'              : this.horario,
@@ -2192,6 +2187,7 @@ export default {
               url : urlRegistros,
               data : {
                 'ot'                   : this.otdata,
+                'obra'                 : this.obra,
                 'fecha'                : this.fecha,
                 'tipo_servicio'        : this.tipo_servicio,
                 'horario'              : this.horario,

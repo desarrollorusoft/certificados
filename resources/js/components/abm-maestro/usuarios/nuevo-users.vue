@@ -314,7 +314,8 @@ export default {
                         'notificar_por_mail_sn':false,
                         'email' : '',
                         'password' : '',
-                        'path':''
+                        'path':'',
+                        'firmas':[],
                 },
                 this.password2='',
                 this.isEnod=true,
@@ -434,7 +435,7 @@ export default {
                 'path'      : this.Registro.path,
                 'metodos_firmas' : this.metodos_firmas,
                 'roles'     :this.user_rol,
-                'firmas' : this.Registro.firmas
+                'firmas'    : this.Registro.firmas
 
 
                 }).then(response => {

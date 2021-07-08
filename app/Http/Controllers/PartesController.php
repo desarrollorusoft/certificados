@@ -190,6 +190,7 @@ class PartesController extends Controller
         }
 
         $parte->ot_id = $request->ot['id'];
+        $parte->obra = $request->obra;
         $parte->fecha = date('Y-m-d',strtotime($request->fecha));
         $parte->tipo_servicio = $request->tipo_servicio;
         $parte->horario = $request->horario;

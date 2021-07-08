@@ -30,7 +30,7 @@ class PdfPartesController extends Controller
         }
 
         $parte = Partes::where('id',$id)
-                        ->selectRaw('partes.*,(SELECT informes.obra from informes WHERE informes.parte_id = ? UNION SELECT informes_importados.obra from informes_importados WHERE informes_importados.parte_id = ?  limit 1) as obra',[$id,$id])
+                        ->selectRaw('partes.*',[$id,$id])
                         ->first();
 
         $ot = Ots::find($parte->ot_id);

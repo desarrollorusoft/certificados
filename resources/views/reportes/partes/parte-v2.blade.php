@@ -57,29 +57,27 @@ footer {
                     <td style="font-size: 12px;height: 20px; text-align: left;" colspan="6"><b>VEHÍCULOS</td>
                 </tr>
                 <tr>
-                    <th style="font-size: 12px;height: 20px;width: 140px;">Marca</th>
-                    <th style="font-size: 12px;height: 20px;width: 140px;">Modelo</th>
-                    <th style="font-size: 12px;height: 20px;width: 140px;">Tipo</th>
-                    <th style="font-size: 12px;height: 20px;width: 140px;">Patente</th>
-                    <th style="font-size: 12px;height: 20px;width: 80px;">Km inicial</th>
-                    <th style="font-size: 12px;height: 20px;">km final</th>
+                    <th style="font-size: 12px;height: 20px;width: 20px;text-align: left;">&nbsp;</th>
+                    <th style="font-size: 12px;height: 20px;width: 140px;text-align: left;">Marca</th>
+                    <th style="font-size: 12px;height: 20px;width: 140px;text-align: left;">Modelo</th>
+                    <th style="font-size: 12px;height: 20px;width: 120px;text-align: left;">Tipo</th>
+                    <th style="font-size: 12px;height: 20px;width: 120px;text-align: left;">Patente</th>
+                    <th style="font-size: 12px;height: 20px;width: 80px;text-align: left;">Km inicial</th>
+                    <th style="font-size: 12px;height: 20px;text-align: left;">km final</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($vehiculos as $vehiculo)
-
                     <tr>
-                        <td style="font-size: 12px;height: 20px;width: 140px;">{{$vehiculo->marca}}</td>
-                        <td style="font-size: 12px;height: 20px;width: 140px;">{{$vehiculo->modelo}}</td>
-                        <td style="font-size: 12px;height: 20px;width: 140px;">{{$vehiculo->tipo}}</td>
-                        <td style="font-size: 12px;height: 20px;width: 140px;">{{$vehiculo->patente}}</td>
-                        <td style="font-size: 12px;height: 20px;width: 80px;">{{$vehiculo->km_inicial}}</td>
-                        <td style="font-size: 12px;height: 20px;">{{$vehiculo->km_final}}</td>
-
+                        <th style="font-size: 12px;height: 20px;width: 20px;text-align: left;">&nbsp;</th>
+                        <td style="font-size: 12px;height: 20px;width: 140px;text-align: left;">{{$vehiculo->marca}}</td>
+                        <td style="font-size: 12px;height: 20px;width: 140px;text-align: left;">{{$vehiculo->modelo}}</td>
+                        <td style="font-size: 12px;height: 20px;width: 120px;text-align: left;">{{$vehiculo->tipo}}</td>
+                        <td style="font-size: 12px;height: 20px;width: 120px;text-align: left;">{{$vehiculo->patente}}</td>
+                        <td style="font-size: 12px;height: 20px;width: 80px;text-align: left;">{{$vehiculo->km_inicial}}</td>
+                        <td style="font-size: 12px;height: 20px;text-align: left;">{{$vehiculo->km_final}}</td>
                     </tr>
-
                 @endforeach
-
             </tbody>
         </table>
     @endif
