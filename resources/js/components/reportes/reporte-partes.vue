@@ -52,6 +52,17 @@
                             <v-select v-show="selObra" v-model="obra" label="obra" :options="obras" @input="CambioObra()"></v-select>
                         </li>
                         <li class="list-group-item pointer">
+                            <div v-show="!selGenerador">
+                                <span class="titulo-li">Generador</span>
+                                <a @click="selGenerador = !selGenerador" class="pull-right">
+                                    <div v-if="generador">{{generador.name}}</div>
+                                    <div v-else><span class="seleccionar">Seleccionar</span></div>
+                                </a>
+                            </div>
+                            <v-select v-show="selGenerador" v-model="generador" label="name" :options="users_empresa" @input="selGenerador = !selGenerador"></v-select>
+
+                        </li>
+                        <li class="list-group-item pointer">
                             <span class="titulo-li">Solo sin certificado</span>  <input class="checkbox-right" type="checkbox" v-model="filtrado" >
                         </li>
                         <li class="list-fecha list-group-item pointer">
@@ -71,7 +82,6 @@
                             Buscar
                         </button>
                     </a>
-
                 </div>
             </div>
         </div>
@@ -79,7 +89,14 @@
 
             <tabs :options="{ useUrlFragment: false }">
                  <tab name="Partes">
-                    <div class="row">
+                    <div  v-if="(tablaPartes.data && tablaPartes.data.length)">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <button @click="exportarPdf">Exportar PDF</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 25px;">
                         <div class="col-lg-12">
                         <div v-if="(tablaPartes.data && tablaPartes.data.length)">
                             <div class="box box-primary">
@@ -94,6 +111,7 @@
                                       <th class="col-md-1">Fecha</th>
                                       <th  style="text-align:center" class="col-md-1">Parte</th>
                                       <th style="text-align:center" class="col-md-2">Cliente</th>
+                                      <th style="text-align:center" class="col-md-2">Generador</th>
                                       <th style="text-align:center" class="col-md-1">Obra</th>
                                       <th style="text-align:center" class="col-md-1">Ot</th>
                                       <th style="text-align:center" class="col-md-1">N°Certificado</th>
@@ -104,6 +122,7 @@
                                         <a :href="'/pdf/parte/' + item.numero + '/final' " target="_blank" title="Informe"><span>{{ item.numero_formateado }}</span></a>
                                       </td>
                                       <td style="text-align:center"> {{ item.cliente}}</td>
+                                      <td style="text-align:center"> {{ item.generador}}</td>
                                       <td style="text-align:center"> {{ item.obra}}</td>
                                       <td style="text-align:center"> {{ item.ot}}</td>
                                       <td style="text-align:center">
@@ -137,6 +156,7 @@
 
 <script>
 import moment from 'moment';
+import { imgDataLogo } from './imagenes-reportes'
 import Datepicker from 'vuejs-datepicker';
 import {mapState} from 'vuex';
 import {en, es} from 'vuejs-datepicker/dist/locale'
@@ -145,6 +165,8 @@ import Loading from 'vue-loading-overlay';
 import ChartJsPluginDataLabels from 'chartjs-plugin-datalabels';
 import DoughnutChart from '../chart.js/DoughnutChart.js'
 import BarChart from '../chart.js/BarChart.js'
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import PieChart from '../chart.js/PieChart.js'
 import html2canvas from 'html2canvas-render-offscreen';
 export default {
@@ -173,6 +195,7 @@ export default {
         en: en,
         es: es,
         cliente:'',
+        generador: '',
         filtrado: false,
         ots:[],
         ot:'',
@@ -181,11 +204,12 @@ export default {
         fecha_desde:null,
         fecha_hasta:null,
         selCliente:false,
+        selGenerador:false,
         selOt:false,
         selObra:false,
         selComponente:false,
         fecha_actual: moment(new Date()).format('DD-MM-YYYY'),
-
+        users_empresa: [],
         /* Tabla PARTES */
         tablaPartes:{},
 
@@ -199,7 +223,7 @@ export default {
     mounted() {
 
         this.$store.dispatch('loadClientesOperador',this.user.id);
-
+        this.getUsersEmpresa();
     },
 
     computed :{
@@ -212,6 +236,108 @@ export default {
 
 methods :{
 
+    async exportarPdf (){
+     console.log('entra')
+     this.$store.commit('loading', true);
+     let tablaPartesPdf = [];
+
+        try {
+            console.log('entra al try')
+            let url8 = 'reporte-partes' + '/cliente/' + (this.cliente ? this.cliente.id : 'null') + '/user/' + (this.generador ? this.generador.id : 'null') + '/ot/' + (this.ot ? this.ot.id : 'null' )  + '/obra/' + (this.obra ? this.obra.obra.replace('/','--') : 'null' ) + '/fecha_desde/' + this.fecha_desde + '/fecha_hasta/' + this.fecha_hasta + '/filtrado/' + this.filtrado_sn + '/paginado_sn/' + 0 + '?api_token=' + Laravel.user.api_token;;
+            let res8 = await axios.get(url8);
+            console.log(res8)
+            tablaPartesPdf = res8.data;
+            console.log(tablaPartesPdf)
+
+        }catch(error){
+
+        }finally  {this.$store.commit('loading', false);}
+
+        const doc = new jsPDF("landscape", "mm", "a4");
+        doc.setFont("serif");
+        console.log(tablaPartesPdf)
+        doc.setFontSize(20);
+        doc.autoTable({
+            startY: 45,
+            body: tablaPartesPdf,
+            columns: [
+                { header: 'Fecha', dataKey: 'fecha' },
+                { header: 'Parte', dataKey: 'numero_formateado' },
+                { header: 'Cliente', dataKey: 'cliente' },
+                { header: 'Generador', dataKey: 'generador' },
+                { header: 'Obra', dataKey: 'obra' },
+                { header: 'Ot', dataKey: 'ot' },
+                { header: 'N°Certificado', dataKey: 'certificado_formateado' },
+            ],
+            columnStyles: {
+                0: { cellWidth: 30, fontSize: 8, halign: 'left' },
+                1: { cellWidth: 40, fontSize: 8, halign: 'left' },
+                2: { cellWidth: 60, fontSize: 8, halign: 'left' },
+                3: { cellWidth: 40, fontSize: 8, halign: 'left' },
+                4: { cellWidth: 40, fontSize: 8, halign: 'left' },
+                5: { cellWidth: 30, fontSize: 8, halign: 'left' },
+                6: { cellWidth: 30, fontSize: 8, halign: 'left' },
+            },
+            margin: { top: 45 },
+            })
+        this.prepareHeaderPdf(doc);
+        window.open(doc.output('bloburl'));
+    },
+        prepareHeaderPdf(doc){
+        var pageCount = doc.internal.getNumberOfPages();
+            for(let i = 0; i < pageCount; i++) {
+                doc.setPage(i);
+
+                /* header logo */
+                doc.setFontSize(16);
+                doc.setFont("bold");
+                doc.text("Reporte Partes", 125,15)
+                doc.setFontSize(8);
+                doc.text("FECHA :",245,13)
+                doc.text("PAGINA:",245,18);
+                doc.setFont("normal");
+                doc.text(this.fecha_actual,267,13)
+                doc.text(doc.internal.getCurrentPageInfo().pageNumber + " de " + pageCount,269,18);
+                doc.addImage(imgDataLogo, 'PNG', 13, 10,39.12, 12);
+
+                /* linea amarilla */
+
+                doc.setLineWidth(0.8);
+                doc.setDrawColor(255,204,0);
+                doc.line(11, 25, 285, 25);
+
+                /* header entre lineas */
+                doc.setFontSize(10);
+                doc.setFont("bold");
+
+                doc.text("Cliente: ", 14, 30);
+                doc.text("OT Nº:", 100, 30);
+                doc.text("Desde:", 180, 30);
+                doc.text("Hasta:", 245, 30);
+
+                doc.text("Generador:", 14, 38);
+                doc.text("Obra:", 100, 38);
+                doc.text("Solo sin certificado:", 180, 38);
+
+                /* Datos del header*/
+                doc.setFont("normal");
+                doc.setFont("italic");
+
+                doc.text(this.ot ? this.ot.numero.toString() : '', 112, 30)
+                doc.text((this.fecha_desde ? moment( this.fecha_desde).format("DD/MM/YYYY") : ' '), 192, 30)
+                doc.text((this.fecha_hasta ? moment( this.fecha_hasta).format("DD/MM/YYYY") : ' '), 255, 30)
+                doc.text(this.cliente ? this.cliente.nombre_fantasia : '', 32, 30)
+                doc.text(this.generador ? this.generador.name : '', 32, 38)
+                doc.text(this.obra ? this.obra.obra : '', 112, 38)
+                doc.text(this.filtrado_sn ? 'SI' : 'NO', 210, 38)
+
+                /* linea amarilla */
+
+                doc.setLineWidth(0.8);
+                doc.setDrawColor(255,204,0);
+                doc.line(11, 42, 285, 42);
+            }
+    },
     async CambioCliente (){
 
         this.selCliente = !this.selCliente;
@@ -263,7 +389,7 @@ methods :{
      this.tablaPartes = {};
 
         try {
-            let url4 = 'reporte-partes' + '/cliente/' + (this.cliente ? this.cliente.id : 'null')  + '/ot/' + (this.ot ? this.ot.id : 'null' )  + '/obra/' + (this.obra ? this.obra.obra.replace('/','--') : 'null' ) + '/fecha_desde/' + this.fecha_desde + '/fecha_hasta/' + this.fecha_hasta + '/filtrado/' + this.filtrado_sn + '?page='+ page + '&api_token=' + Laravel.user.api_token;
+            let url4 = 'reporte-partes' + '/cliente/' + (this.cliente ? this.cliente.id : 'null') + '/user/' + (this.generador ? this.generador.id : 'null') + '/ot/' + (this.ot ? this.ot.id : 'null' )  + '/obra/' + (this.obra ? this.obra.obra.replace('/','--') : 'null' ) + '/fecha_desde/' + this.fecha_desde + '/fecha_hasta/' + this.fecha_hasta + '/filtrado/' + this.filtrado_sn + '/paginado_sn/' + 1 + '?page='+ page + '&api_token=' + Laravel.user.api_token;
             let res4 = await axios.get(url4);
             this.tablaPartes = res4.data;
 
@@ -273,6 +399,13 @@ methods :{
 
    },
 
+    getUsersEmpresa : function(){
+        axios.defaults.baseURL = this.url ;
+        var urlRegistros = 'users/empresa' + '?api_token=' + Laravel.user.api_token;
+        axios.get(urlRegistros).then(response =>{
+        this.users_empresa = response.data
+        });
+    },
    async seleccionarObra(){
         if(this.ot && !this.ot.obra){
             this.selObra = !this.selObra;
@@ -280,11 +413,11 @@ methods :{
     },
 
     async CambioObra (){
-    
+
         this.obra = this.obra == null ? '' : this.obra;
         this.selObra = !this.selObra;
 
-    },    
+    },
 
 
 }}

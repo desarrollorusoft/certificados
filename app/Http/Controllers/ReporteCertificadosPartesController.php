@@ -34,9 +34,10 @@ class ReporteCertificadosPartesController extends Controller
         return view('reporte-partes.partes',compact('user','header_titulo','header_descripcion'));
 
     }
-    public function getPartes($cliente_id,$ot_id,$obra,$fecha_desde,$fecha_hasta,$filtrado){
+    public function getPartes($cliente_id,$user_id,$ot_id,$obra,$fecha_desde,$fecha_hasta,$filtrado,$paginado_sn){
 
         $cliente_id = $cliente_id == 'null' ? 0 : $cliente_id;
+        $user_id = $user_id == 'null' ? 0 : $user_id;
         $ot_id = $ot_id == 'null' ? 0 : $ot_id;
         $obra = $obra == 'null' ? '' : $obra;
 
@@ -51,10 +52,14 @@ class ReporteCertificadosPartesController extends Controller
         $page = Input::get('page', 1);
         $paginate = 10;
 
-        $data = DB::select('CALL getPartes(?,?,?,?,?,?)',array($cliente_id,$ot_id,$obra,$fecha_desde,$fecha_hasta,$filtrado));
-        $offSet = ($page * $paginate) - $paginate;
-        $itemsForCurrentPage = array_slice($data, $offSet, $paginate, true);
-        $data = new \Illuminate\Pagination\LengthAwarePaginator(array_values($itemsForCurrentPage), count($data), $paginate, $page);
+        $data = DB::select('CALL getPartes(?,?,?,?,?,?,?)',array($cliente_id,$user_id,$ot_id,$obra,$fecha_desde,$fecha_hasta,$filtrado));
+
+        if($paginado_sn == 1) {
+            Log::debug("entro siendo paginado");
+            $offSet = ($page * $paginate) - $paginate;
+            $itemsForCurrentPage = array_slice($data, $offSet, $paginate, true);
+            $data = new \Illuminate\Pagination\LengthAwarePaginator(array_values($itemsForCurrentPage), count($data), $paginate, $page);
+        }
         return $data;
 
     }

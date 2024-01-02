@@ -743,7 +743,7 @@
                                <div class="col-md-12">
                                     <div class="form-group" >
                                         <label for="cantidad_generatrices_linea_pdf_me" title="Cantidad Generatrices por linea en informe">Generatrices por Linea en pdf *</label>
-                                        <input type="number" v-model="cantidad_generatrices_linea_pdf_me" class="form-control" id="cantidad_generatrices_linea_pdf_me" min="1" max="15">
+                                        <input type="number" v-model="cantidad_generatrices_linea_pdf_me" class="form-control" id="cantidad_generatrices_linea_pdf_me" min="1" max="18">
                                     </div>
                                 </div>
 
@@ -792,7 +792,7 @@
                                                     <td>{{ item.cantidad_generatrices_me}}</td>
                                                     <td>
                                                         <div v-if="indexPosTabla_me === k">
-                                                           <input type="number" v-model="item.cantidad_generatrices_linea_pdf_me" min="1" max="15">
+                                                           <input type="number" v-model="item.cantidad_generatrices_linea_pdf_me" min="1" max="18">
                                                         </div>
                                                         <div v-else>
                                                              {{ item.cantidad_generatrices_linea_pdf_me}}
@@ -1182,7 +1182,7 @@ export default {
         diametro_me:'',
         cantidad_posiciones_me:'',
         cantidad_generatrices_me:'',
-        cantidad_generatrices_linea_pdf_me: 15,
+        cantidad_generatrices_linea_pdf_me: 18,
 
         tecnicas:[],
         estados_superficies:[],

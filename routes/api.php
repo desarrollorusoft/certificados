@@ -705,7 +705,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         'ReportePlacasController@getServicios'
     );
     Route::get(
-        'reporte-partes/cliente/{cliente_id}/ot/{ot_id}/obra/{obra}/fecha_desde/{fecha_desde}/fecha_hasta/{fecha_hasta}/filtrado/{filtrado}',
+        'reporte-partes/cliente/{cliente_id}/user/{user_id}/ot/{ot_id}/obra/{obra}/fecha_desde/{fecha_desde}/fecha_hasta/{fecha_hasta}/filtrado/{filtrado}/paginado_sn/{paginado_sn}',
         'ReporteCertificadosPartesController@getPartes'
     );
     Route::get(
